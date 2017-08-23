@@ -1,0 +1,12 @@
+.header{
+    background: #cdcdcd;
+}
+.message{
+    margin: 10px;
+}
+.good{
+    background-color: mediumseagreen;
+}
+.bad{
+    background-color: indianred;
+}
