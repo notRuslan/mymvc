@@ -15,13 +15,13 @@ class User
         return $users;
     }
 
-/*    public function first($id)
-    {
-        $sql = 'SELECT * FROM users WHERE id =' . $id;
-        $users = DB::getInstance()->querySql($sql);
-        pr($users);
-        return $users;
-    }*/
+    /*    public function first($id)
+        {
+            $sql = 'SELECT * FROM users WHERE id =' . $id;
+            $users = DB::getInstance()->querySql($sql);
+            pr($users);
+            return $users;
+        }*/
 
     public function destroy($id)
     {
@@ -48,8 +48,6 @@ class User
 
     public function add($data)
     {
-//        pr($data);
-//        die();
         $name = $data['name'];
         $age = $data['age'];
         $description = $data['description'];
@@ -61,5 +59,27 @@ class User
 //        pr($res);
         return $res;
     }
+
+    public function update($data)
+    {
+        $name = $data['name'];
+        $age = $data['age'];
+        $description = $data['description'];
+        $avatar_url = $data['avatar_url'];
+
+//        $DBH = DB::getInstance();
+        $sql = "UPDATE users 
+            SET name = :name,
+            age = :age,
+            description = :description,
+            password = :password,
+            avatar_url = :avatar_url
+            WHERE id = :id";
+//            avatar_url = IF(trim(:avatar_url)=\"\", avatar_url, :avatar_url)
+        $res = DB::getInstance()->executeWithParams($sql, $data);
+        pr($res);
+        return $res;
+    }
+
 
 }

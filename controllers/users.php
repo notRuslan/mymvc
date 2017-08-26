@@ -33,24 +33,25 @@ class Users
 
     public function login()
     {
-        if($_POST){
+        if ($_POST) {
             $users_model = new User();
             $user = $users_model->getByName($_POST['data']['user']['name']);
-            if($user) {
-                if($user['password'] == $_POST['data']['user']['password']){
+            if ($user) {
+                if ($user['password'] == $_POST['data']['user']['password']) {
                     Auth::setAuth($user);
                     Message::setMessage('Successfully!');
-                }else{
+                } else {
                     Message::setMessage('Wrong data, try again!', 1);
                 }
-                header('Location: /users/view/'. $user['id']);
+                header('Location: /users/view/' . $user['id']);
             }
         }
         $view = new View();
         $view->render('users/login');
     }
 
-    public function logout(){
+    public function logout()
+    {
         session_destroy();
         session_start();
         header('Location: /users/login');
@@ -60,10 +61,84 @@ class Users
     {
         $users_model = new User();
         $user = $users_model->getById($id);
-        pr($user);
+//        pr($user);
         $view = new View();
         $view->render('users/view', $user);
     }
+
+    public function edit($id)
+    {
+        $users_model = new User();
+        if ($_POST) {
+        $avatar_url = $_POST['data']['user']['avatar_url'];
+            pr($_POST);
+            if ($_FILES['uploadFile']['name']) {
+                $avatar_url = $this->fileUpload($avatar_url);
+                pr($avatar_url);
+            }
+            $_POST['data']['user']['avatar_url'] = $avatar_url;
+            pr($_POST);
+            $user = $users_model->update($_POST['data']['user']);
+
+        }
+        $user = $users_model->getById($id);
+
+        pr($user);
+        $view = new View();
+        $view->render('users/edit', $user);
+    }
+
+    protected function fileUpload($old_file = '')
+    {
+        $uploadOk = 1;
+
+        if($old_file){
+            unlink($old_file);
+        }
+        $check = getimagesize($_FILES["uploadFile"]["tmp_name"]);
+        if ($check !== false) {
+            echo "File is an image - " . $check["mime"] . ".";
+            $uploadOk = 1;
+        } else {
+            Message::setMessage('File is not an image.', 1);
+            $uploadOk = 0;
+        }
+        $target_file = USERS_PICS_DIR . basename($_FILES["uploadFile"]["name"]);
+        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+        // Check if file already exists
+     if (file_exists($target_file)) {
+            Message::setMessage('Sorry, file already exists.', 1);
+            $uploadOk = 0;
+        }
+// Check file size
+        if ($_FILES["uploadFile"]["size"] > 500000) {
+            Message::setMessage('Sorry, your file is too large.', 1);
+            $uploadOk = 0;
+        }
+        // Allow certain file formats
+        if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+            && $imageFileType != "gif") {
+            Message::setMessage('Sorry, only JPG, JPEG, PNG & GIF files are allowed.', 1);
+            $uploadOk = 0;
+        }
+        // Check if $uploadOk is set to 0 by an error
+        if ($uploadOk == 0) {
+            echo "Sorry, your file was not uploaded.";
+            Message::setMessage('Sorry, your file was not uploaded.', 1);
+// if everything is ok, try to upload file
+        } else {
+            if (move_uploaded_file($_FILES["uploadFile"]["tmp_name"], $target_file)) {
+                return $target_file;
+            } else {
+                Message::setMessage('Sorry, there was an error uploading your file.', 1);
+
+            }
+        }
+
+
+    }
+
+    #Private
 
     public function show($id)
     {
