@@ -10,3 +10,12 @@
 .bad{
     background-color: indianred;
 }
+
+.user_list{
+    border-collapse: collapse;
+}
+
+.user_list th, .user_list td {
+    border: 1px solid #cdcdcd;
+    padding: 5px;
+}

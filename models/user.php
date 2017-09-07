@@ -1,6 +1,7 @@
 <?php
 
 namespace App;
+
 require_once __DIR__ . "/../core/config.php";
 
 class User
@@ -23,9 +24,14 @@ class User
             return $users;
         }*/
 
-    public function destroy($id)
+    public function delete($id)
     {
-        unset ($this->users[$id]);
+       $id = intval($id);
+       $sql = 'DELETE FROM users WHERE id = :id' ;
+        $data = ['id' => $id];
+        $res = DB::getInstance()->executeWithParams($sql, $data);
+//        pr($res);
+
     }
 
     public function getById($id)
@@ -48,12 +54,8 @@ class User
 
     public function add($data)
     {
-        $name = $data['name'];
-        $age = $data['age'];
-        $description = $data['description'];
-        $avatar_url = $data['avatar_url'];
-
 //        $DBH = DB::getInstance();
+        $data = $this->__stripData($data);
         $sql = "INSERT INTO users (name, age, description, password) VALUES (:name, :age, :description, :password)";
         $res = DB::getInstance()->executeWithParams($sql, $data);
 //        pr($res);
@@ -62,11 +64,7 @@ class User
 
     public function update($data)
     {
-        $name = $data['name'];
-        $age = $data['age'];
-        $description = $data['description'];
-        $avatar_url = $data['avatar_url'];
-
+        $data = $this->__stripData($data);
 //        $DBH = DB::getInstance();
         $sql = "UPDATE users 
             SET name = :name,
@@ -77,9 +75,15 @@ class User
             WHERE id = :id";
 //            avatar_url = IF(trim(:avatar_url)=\"\", avatar_url, :avatar_url)
         $res = DB::getInstance()->executeWithParams($sql, $data);
-        pr($res);
+//        pr($res);
         return $res;
     }
 
-
+    private function __stripData($data)
+    {
+        foreach ($data as $k => $v) {
+            $data[$k] = strip_tags($v);
+        }
+        return $data;
+    }
 }

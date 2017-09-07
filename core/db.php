@@ -67,7 +67,9 @@ class  DB
             pr($this->_conn->errorInfo());
         }
         foreach ($params as $param => &$value) {
-            $stm->bindParam(':' . $param, $value ? $value : NULL);
+//            $val = ($value) ? $value : null;
+            $stm->bindParam( $param, $value);
+//            $stm->bindParam(':' . $param, $value);
         }
 //pr($stm->debugDumpParams());
         $stm->execute();
@@ -78,7 +80,7 @@ class  DB
         }
     }
 
-
+#Private
     private function __clone()
     {
     }

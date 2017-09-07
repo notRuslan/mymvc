@@ -9,5 +9,28 @@
     <link rel='stylesheet' href='/css/style.css'>
 </head>
 <body>
-<div class="button"><?php echo $_SESSION['user']?$_SESSION['user']['name'] . ': ':'' ?> <a href="/users/logout">Logout</a> </div>
+<?php if($_SESSION['user']['id']) : ?>
+    <ul>
+        <li><a href="/users/edit/<?php echo $_SESSION['user']['id']; ?>" >Edit Profile</a></li>
+        <li><?php echo $_SESSION['user']?$_SESSION['user']['name'] . ': ':'' ?> <a href="/users/logout">Logout</a> </li>
+    </ul>
 
+<?php endif ;?>
+
+<?php if(!$_SESSION['user']['id']) : ?>
+    <ul>
+        <li><a href="/users/index">Users list</a></li>
+        <li><a href="/users/registration">Registration</a></li>
+        <li><a href="/users/login">Login</a></li>
+    </ul>
+
+<?php endif ;?>
+
+
+
+
+<?php if($_SESSION['user']['admin']) : ?>
+    <ul>
+        <li><a href="/admins/index">Edit users list</a></li>
+    </ul>
+<?php endif ;?>

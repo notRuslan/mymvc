@@ -1,4 +1,7 @@
 <?php
+/**
+ * Controller for users administrations
+ */
 
 namespace App;
 
@@ -6,71 +9,33 @@ require_once __DIR__ . "/../models/user.php";
 
 use Intervention\Image\ImageManagerStatic as Image;
 
-class Users
+class Admins
 {
-
     public function index()
     {
         $users_model = new User();
         $users = $users_model->all();
         $view = new View();
         $data['users'] = $users;
-        $view->render('users/index', $data);
+        $view->render('admins/index', $data);
     }
 
-    public function registration()
+    public function delete()
     {
-        if ($_POST) {
-//        header('Location: /users/registration');
-            $users_model = new User();
-            if ($users_model->add($_POST['data']['user'])) {
-                Message::setMessage('Successfully registered!');
-                header('Location: /users/login');
-            } else {
-                Message::setMessage('You are not registered, try again!', 1);
-            }
-        }
-        $view = new View();
-        $view->render('users/registration');
-    }
-
-    public function login()
-    {
-        if ($_POST) {
-            $users_model = new User();
-            $user = $users_model->getByName($_POST['data']['user']['name']);
-            Message::setMessage('Wrong data, try again!', 1);
-            if ($user) {
-                if ($user['password'] == $_POST['data']['user']['password']) {
-                    Auth::setAuth($user);
-                    Message::setMessage('Successfully!');
-                    if(Auth::getAuthUser()['admin']){
-                        header('Location: /admins/index');
-                        return;
-                    }
-                    header('Location: /users/index');
-//                    header('Location: /users/view/' . $user['id']);
-                }
-            }
-        }
-        $view = new View();
-        $view->render('users/login');
-    }
-
-    public function logout()
-    {
-        session_destroy();
-        session_start();
-        header('Location: /users/login');
-    }
-
-    public function view($id)
-    {
+//            pr($_POST);
         $users_model = new User();
-        $user = $users_model->getById($id);
-//        pr($user);
+
+        if ($users_model->delete($_POST['data']['user']['id'])) {
+            Message::setMessage('Deleted Successfuly');
+        } else {
+            Message::setMessage('Could not delete', 1);
+        }
+
+        $users = $users_model->all();
         $view = new View();
-        $view->render('users/view', $user);
+        $data['users'] = $users;
+//        $view->render('admins/index', $data);
+        header('Location: /admins/index');
     }
 
     public function edit($id)
@@ -140,8 +105,8 @@ class Users
 // if everything is ok, try to upload file
         } else {
 //            if (move_uploaded_file($_FILES["uploadFile"]["tmp_name"], $target_file)) {
-        $img = Image::make($_FILES["uploadFile"]["tmp_name"]); //Открываем
-        //Изменяем размер resize the image to a width of 100 and constrain aspect ratio (auto height)
+            $img = Image::make($_FILES["uploadFile"]["tmp_name"]); //Открываем
+            //Изменяем размер resize the image to a width of 100 and constrain aspect ratio (auto height)
             $img->resize(100, null, function ($constraint) {
                 $constraint->aspectRatio();
             });
@@ -157,14 +122,4 @@ class Users
 
     }
 
-    #Private
-
-    public function show($id)
-    {
-        $users_model = new User();
-        $user = $users_model->get($id);
-        $view = new View();
-        $data['user'] = array_pop($user);
-        $view->render('users/show', $data);
-    }
 }
